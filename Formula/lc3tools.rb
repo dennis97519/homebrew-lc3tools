@@ -10,13 +10,21 @@ class Lc3tools < Formula
   sha256 "3d3334a257bca4788999469a8633f0701418f3f8555604210036786d2001b772"
 
   def install
-    system "./configure --installdir #{prefix}/bin"
+    #compile and install
+    system "./configure", "--installdir", prefix
     system "make"
-    system "make install" # if this fails, try separate make/make install steps
-    #move documentation files out of bin
-    system "mv #{prefix}/bin/COPYING #{prefix}/bin/NO_WARRANTY #{prefix}/bin/README #{prefix}/"
+    system "make", "install" 
+
     #change font from lucida console (unavailbe on mac) to menlo
-    system "sed -i -e \"s/Lucida Console/Menlo/g\" #{prefix}/bin/lc3sim-tk"
+    system "sed", "-i", "", "-e" ,"s/Lucida Console/Menlo/g", "#{prefix}/lc3sim-tk"
+
+    #symlink executables into bin
+    system "mkdir", "#{prefix}/bin"
+    system "ln","-s", "#{prefix}/lc3sim-tk", "#{prefix}/bin/lc3sim-tk"
+    system "ln","-s", "#{prefix}/lc3sim", "#{prefix}/bin/lc3sim"
+    system "ln","-s", "#{prefix}/lc3as", "#{prefix}/bin/lc3as"
+    system "ln","-s", "#{prefix}/lc3convert", "#{prefix}/bin/lc3convert"
+
   end
 
   test do
@@ -29,6 +37,9 @@ class Lc3tools < Formula
     #
     # The installed folder is not in the path, so use the entire path to any
     # executables being tested: `system "#{bin}/program", "do", "something"`.
-    system "true"
+    system "which lc3as"
+    system "which lc3convert"
+    system "which lc3sim-tk"
+    system "lc3sim -s /dev/null"
   end
 end
