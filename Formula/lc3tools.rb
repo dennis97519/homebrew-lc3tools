@@ -8,11 +8,12 @@ class Lc3tools < Formula
   url "http://highered.mheducation.com/sites/dl/free/0072467509/104652/lc3tools_v12.zip"
   version "12"
   sha256 "3d3334a257bca4788999469a8633f0701418f3f8555604210036786d2001b772"
-
+  depends_on "readline" => :recommended
   def install
+
     #compile and install
     system "./configure", "--installdir", prefix
-    system "make"
+    system "make", "CFLAGS=-g", "LDFLAGS=-lreadline", "USE_READLINE=-DUSE_READLINE"
     system "make", "install" 
 
     #change font from lucida console (unavailbe on mac) to menlo
