@@ -12,12 +12,50 @@ class Lc3tools < Formula
   def install
 
     #compile and install
+	configf=File.read("configure")
+	if (/darwin/ =~ RUBY_PLATFORM) != nil
+		configf.gsub!("Lucida Console","Menlo")
+	else
+		configf.gsub!("Lucida Console","Monospace")
+	end
+	f= File.open("configure",'w')
+	f.write(configf)
+	f.close()
     system "./configure", "--installdir", prefix
-    system "make", "CFLAGS=-g", "LDFLAGS=-lreadline", "USE_READLINE=-DUSE_READLINE"
+	mfpath="Makefile"
+	mf=File.readlines(mfpath)
+	f = File.open(mfpath, 'w')
+	f.write('')
+	f.close()
+	f = File.open(mfpath, 'a')
+	i=0
+	while i < mf.size()
+		line=mf[i]
+		line.gsub!("\n","")
+		repl=line.gsub!("${LDFLAGS}","")
+		f.write(line)
+		if repl != nil
+			repl=line.gsub!("\\","\\")
+			if repl != nil
+				f.write("\n")
+				i+=1
+				line=mf[i]
+				line.gsub!("\n","")
+				f.write("#{line} ${LDFLAGS}")
+			else
+				f.write(" ${LDFLAGS}")
+			end
+		end
+		f.write("\n")
+		i+=1
+	end
+	f.close()
+
+    system "make", "CFLAGS+=-g", "LDFLAGS+=-lreadline", "USE_READLINE+=-DUSE_READLINE"
     system "make", "install" 
 
     #change font from lucida console (unavailbe on mac) to menlo
-    system "sed", "-i", "", "-e" ,"s/Lucida Console/Menlo/g", "#{prefix}/lc3sim-tk"
+    #system "sed", "-i", "", "-e" ,"s/Lucida Console/Menlo/g", "#{prefix}/lc3sim-tk"
 
     #symlink executables into bin
     system "mkdir", "#{prefix}/bin"
