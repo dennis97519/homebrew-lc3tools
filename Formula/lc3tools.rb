@@ -12,6 +12,7 @@ class Lc3tools < Formula
   def install
 
     #compile and install
+	#change font directly in the configure script
 	configf=File.read("configure")
 	if (/darwin/ =~ RUBY_PLATFORM) != nil
 		configf.gsub!("Lucida Console","Menlo")
@@ -22,6 +23,8 @@ class Lc3tools < Formula
 	f.write(configf)
 	f.close()
     system "./configure", "--installdir", prefix
+	
+	#move linking options (-lreadline) to the end of gcc commands so it links on linux  
 	mfpath="Makefile"
 	mf=File.readlines(mfpath)
 	f = File.open(mfpath, 'w')
