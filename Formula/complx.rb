@@ -9,6 +9,7 @@ class Complx < Formula
 
   depends_on "cmake" => :build
   depends_on "wxmac"
+  depends_on "glib"
   def install
     # ENV.deparallelize  # if your formula fails when building in parallel
     system "mkdir", "build"
